@@ -1,50 +1,60 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT, SIZE_UNIT, ctx } from './index';
 
 //  Position des Spielers
-var vPlayerPos = [0, 0];
-// Letzte Position des Spielers
-var vLastPlayerPos = [0, 0];
+var vPlayerPos = [0];
+
+var upPressed = false;
+var downPressed = false;
 
 document.addEventListener('keyup', function(event) {
 	switch (event.code) {
 		case 'ArrowUp': {
-			MovePlayer(0, -1);
+			upPressed = false;
 			break;
 		}
 		case 'ArrowDown': {
-			MovePlayer(0, 1);
-			break;
-		}
-		case 'ArrowLeft': {
-			MovePlayer(-1, 0);
-			break;
-		}
-		case 'ArrowRight': {
-			MovePlayer(1, 0);
+			downPressed = false;
 			break;
 		}
 	}
 });
 
-export function MovePlayer(iXUnit, iYUnit) {
-	vPlayerPos = [
-		vLastPlayerPos[0] + iXUnit * SIZE_UNIT,
-		vLastPlayerPos[1] + iYUnit * SIZE_UNIT,
-	];
-	DrawPlayer();
-}
+document.addEventListener('keydown', function(event) {
+	switch (event.code) {
+		case 'ArrowUp': {
+			upPressed = true;
+			break;
+		}
+		case 'ArrowDown': {
+			downPressed = true;
+			break;
+		}
+	}
+});
 
 export function DrawPlayer() {
-	ctx.clearRect(vLastPlayerPos[0], vLastPlayerPos[1], SIZE_UNIT, SIZE_UNIT);
-	ctx.fillRect(vPlayerPos[0], vPlayerPos[1], SIZE_UNIT, SIZE_UNIT);
-
-	vLastPlayerPos = [vPlayerPos[0], vPlayerPos[1]];
+	if (upPressed) {
+		setRelPlayerPos(-1);
+	} else if (downPressed) {
+		setRelPlayerPos(1);
+	}
+	ctx.fillRect(0, vPlayerPos[0], SIZE_UNIT, SIZE_UNIT);
 }
 
-export function setPlayerPos(iXPos, iYPos) {
-	vPlayerPos = [
-		vLastPlayerPos[0] + iXUnit * SIZE_UNIT,
-		vLastPlayerPos[1] + iYUnit * SIZE_UNIT,
-	];
-	DrawPlayer();
+// Relative Playerpostition
+export function setRelPlayerPos(iYPos) {
+	let newPosition = [vPlayerPos[0] + iYPos * SIZE_UNIT];
+	//out of bounds check
+	if (newPosition[0] > CANVAS_HEIGHT - SIZE_UNIT) {
+		console.log(`size to high ${vPlayerPos[0]}`);
+		return;
+	} else if (newPosition[0] < 0) {
+		console.log(`size to low ${vPlayerPos[0]}`);
+		return;
+	}
+	vPlayerPos = newPosition;
+}
+
+export function getPlayerPos() {
+	return vPlayerPos;
 }
